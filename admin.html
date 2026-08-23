@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BudaMahakal Driving School</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+
+        /* ---- LOGIN ---- */
+        #login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+        .login-box h2 { margin: 0 0 8px; color: #2c3e50; }
+        .login-box p { color: #666; margin: 0 0 24px; }
+        .login-box input {
+            width: 100%; padding: 12px; margin-bottom: 14px;
+            border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;
+        }
+        .login-box button {
+            width: 100%; padding: 12px; background: #3498db; color: white;
+            border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: 600;
+        }
+        .login-box button:hover { background: #2980b9; }
+        .login-error { color: #dc3545; margin-top: 10px; font-size: 0.9rem; }
+
+        /* ---- ADMIN LAYOUT ---- */
+        #admin-screen { display: none; }
+        .admin-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .admin-header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white; padding: 20px 30px; border-radius: 10px;
+            margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .admin-header h1 { margin: 0; font-size: 1.8rem; }
+        .admin-header p { margin: 4px 0 0; opacity: 0.85; font-size: 0.9rem; }
+        .logout-btn {
+            background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+        }
+        .logout-btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* ---- STATS ---- */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white; padding: 20px; border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); text-align: center; border-left: 4px solid #3498db;
+        }
+        .stat-card h3 { margin: 0 0 8px; color: #2c3e50; font-size: 0.95rem; }
+        .stat-number { font-size: 2.2rem; font-weight: bold; color: #3498db; }
+        .stat-label { color: #888; font-size: 0.82rem; margin-top: 4px; }
+
+        /* ---- TABS ---- */
+        .section-tabs {
+            display: flex; background: white; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 24px; overflow: hidden;
+        }
+        .tab-button {
+            flex: 1; padding: 14px 12px; background: none; border: none;
+            cursor: pointer; font-size: 0.9rem; font-weight: 500; color: #666; transition: all 0.2s;
+        }
+        .tab-button.active { background: #3498db; color: white; }
+        .tab-button:hover:not(.active) { background: #f0f2f5; }
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+
+        /* ---- TABLES ---- */
+        .data-table {
+            background: white; border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 20px;
+        }
+        .table-header {
+            background: #f8f9fa; padding: 16px 20px;
+            border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center;
+        }
+        .table-header h3 { margin: 0; color: #2c3e50; font-size: 1rem; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid #f0f2f5; font-size: 0.88rem; }
+        th { background: #f8f9fa; font-weight: 600; color: #2c3e50; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.4px; }
+        tr:hover { background: #fafbfc; }
+        .no-data, .loading { text-align: center; padding: 30px; color: #888; font-style: italic; font-size: 0.9rem; }
+
+        /* ---- BADGES ---- */
+        .status-badge {
+            padding: 3px 9px; border-radius: 12px; font-size: 0.75rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-confirmed { background: #d4edda; color: #155724; }
+        .badge-completed { background: #cce5ff; color: #004085; }
+        .badge-cancelled { background: #f8d7da; color: #721c24; }
+        .badge-present { background: #d4edda; color: #155724; }
+        .badge-absent { background: #f8d7da; color: #721c24; }
+        .badge-late { background: #fff3cd; color: #856404; }
+
+        /* ---- BUTTONS ---- */
+        .btn {
+            padding: 5px 11px; border: none; border-radius: 5px;
+            cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .action-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
+
+        /* ---- FORMS ---- */
+        .form-panel {
+            background: white; padding: 24px; border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 20px;
+        }
+        .form-panel h3 { margin: 0 0 18px; color: #f0f8ff; font-size: 1rem; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 600; color: #2c3e50; font-size: 0.85rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 9px 11px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem;
+        }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+
+        /* ---- DATE FILTER ---- */
+        .filter-bar {
+            background: white; padding: 14px 18px; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 16px;
+            display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+        }
+        .filter-bar label { font-weight: 600; color: #2c3e50; font-size: 0.85rem; }
+        .filter-bar input, .filter-bar select {
+            padding: 7px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.85rem;
+        }
+
+        /* ---- MODAL ---- */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: white; border-radius: 10px; padding: 28px;
+            width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal h3 { margin: 0 0 20px; color: #2c3e50; }
+        .modal .form-group { margin-bottom: 14px; }
+        .modal .form-actions { margin-top: 20px; }
+
+        @media (max-width: 768px) {
+            .admin-container { padding: 10px; }
+            .section-tabs { flex-direction: column; }
+            .form-row { grid-template-columns: 1fr; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+    <div class="login-box">
+        <div style="font-size:3rem;margin-bottom:8px;">🚗</div>
+        <h2>Admin Login</h2>
+        <p>BudaMahakal Driving School</p>
+        <input type="text" id="login-user" placeholder="Username" autocomplete="username">
+        <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
+        <button onclick="doLogin()">Sign In</button>
+        <div class="login-error" id="login-error"></div>
+    </div>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div id="admin-screen">
+<div class="admin-container">
+    <div class="admin-header">
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>BudaMahakal Driving School Management System</p>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Bookings</h3>
+            <div class="stat-number" id="total-bookings">0</div>
+            <div class="stat-label">All Students</div>
+        </div>
+        <div class="stat-card" style="border-left-color:#ffc107">
+            <h3>Pending</h3>
+            <div class="stat-number" style="color:#ffc107" id="pending-bookings">0</div>
+            <div class="stat-label">Awaiting Confirmation</div>
+        </div>
+        <div class="stat-card" style="border-left-color:#28a745">
+            <h3>Today's Attendance</h3>
+            <div class="stat-number" style="color:#28a745" id="today-attendance">0</div>
+            <div class="stat-label">Present Today</div>
+        </div>
+        <div class="stat-card" style="border-left-color:#9b59b6">
+            <h3>Available Courses</h3>
+            <div class="stat-number" style="color:#9b59b6" id="total-courses">0</div>
+            <div class="stat-label">Driving Programs</div>
+        </div>
+        <div class="stat-card" style="border-left-color:#e74c3c">
+            <h3>Active Instructors</h3>
+            <div class="stat-number" style="color:#e74c3c" id="total-instructors">0</div>
+            <div class="stat-label">Teaching Staff</div>
+        </div>
+    </div>
+
+    <div class="section-tabs">
+        <button class="tab-button active" onclick="showSection('bookings', this)">Bookings</button>
+        <button class="tab-button" onclick="showSection('attendance', this)">Attendance</button>
+        <button class="tab-button" onclick="showSection('courses', this)">Courses</button>
+        <button class="tab-button" onclick="showSection('instructors', this)">Instructors</button>
+    </div>
+
+    <!-- ===== BOOKINGS ===== -->
+    <div id="bookings-section" class="section-content active">
+        <div class="filter-bar">
+            <label>Search:</label>
+            <input type="text" id="booking-search" placeholder="Name, email, phone..." oninput="filterBookings()" style="flex:1; min-width:160px;">
+            <label>Status:</label>
+            <select id="booking-status-filter" onchange="filterBookings()">
+                <option value="">All</option>
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="data-table">
+            <div class="table-header">
+                <h3>All Bookings</h3>
+                <span id="booking-count" style="color:#888;font-size:0.85rem;"></span>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Student</th><th>Email</th><th>Phone</th>
+                            <th>Course</th><th>Date</th><th>Status</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-tbody">
+                        <tr><td colspan="8" class="loading">Loading bookings...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ATTENDANCE ===== -->
+    <div id="attendance-section" class="section-content">
+        <div class="form-panel">
+            <h3>Mark Attendance</h3>
+            <form id="attendance-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Select Booking:</label>
+                        <select id="booking-select" required>
+                            <option value="">Choose a booking...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date:</label>
+                        <input type="date" id="attendance-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <select id="attendance-status" required>
+                            <option value="Present">Present</option>
+                            <option value="Absent">Absent</option>
+                            <option value="Late">Late</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Instructor:</label>
+                        <select id="instructor-select" required>
+                            <option value="">Choose instructor...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:14px">
+                    <label>Notes:</label>
+                    <textarea id="attendance-notes" placeholder="Optional notes..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Mark Attendance</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearAttendanceForm()">Clear</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="filter-bar">
+            <label>Filter by Date:</label>
+            <input type="date" id="filter-date">
+            <button class="btn btn-primary" onclick="filterAttendanceByDate()">Filter</button>
+            <button class="btn btn-secondary" onclick="loadAllAttendance()">Show All</button>
+        </div>
+
+        <div class="data-table">
+            <div class="table-header"><h3>Attendance Records</h3></div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Date</th><th>Student</th><th>Course</th><th>Status</th><th>Instructor</th><th>Notes</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="attendance-tbody">
+                        <tr><td colspan="7" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== COURSES ===== -->
+    <div id="courses-section" class="section-content">
+        <div class="data-table">
+            <div class="table-header">
+                <h3>Available Courses</h3>
+                <button class="btn btn-success" onclick="openCourseModal()">+ Add Course</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Name</th><th>Vehicle</th><th>Duration</th><th>Price (Rs)</th><th>Sessions</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="courses-tbody">
+                        <tr><td colspan="7" class="loading">Loading courses...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== INSTRUCTORS ===== -->
+    <div id="instructors-section" class="section-content">
+        <div class="data-table">
+            <div class="table-header">
+                <h3>Teaching Staff</h3>
+                <button class="btn btn-success" onclick="openInstructorModal()">+ Add Instructor</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Name</th><th>Specialization</th><th>Experience</th><th>Phone</th><th>Email</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="instructors-tbody">
+                        <tr><td colspan="7" class="loading">Loading instructors...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /admin-container -->
+</div><!-- /admin-screen -->
+
+<!-- ===== COURSE MODAL ===== -->
+<div class="modal-overlay" id="course-modal">
+    <div class="modal">
+        <h3 id="course-modal-title">Add Course</h3>
+        <input type="hidden" id="course-edit-id">
+        <div class="form-group"><label>Course Name:</label><input type="text" id="c-name" placeholder="e.g. Car Driving - 7 Days"></div>
+        <div class="form-group"><label>Description:</label><textarea id="c-desc" placeholder="Short description..."></textarea></div>
+        <div class="form-row">
+            <div class="form-group"><label>Vehicle Type:</label>
+                <select id="c-vehicle">
+                    <option value="Car">Car</option><option value="Bike">Bike</option><option value="Scooter">Scooter</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Duration (days):</label><input type="number" id="c-duration" min="1"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Price (Rs):</label><input type="number" id="c-price" min="0"></div>
+            <div class="form-group"><label>Sessions:</label><input type="number" id="c-sessions" min="1"></div>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" onclick="saveCourse()">Save</button>
+            <button class="btn btn-secondary" onclick="closeModal('course-modal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== INSTRUCTOR MODAL ===== -->
+<div class="modal-overlay" id="instructor-modal">
+    <div class="modal">
+        <h3 id="instructor-modal-title">Add Instructor</h3>
+        <input type="hidden" id="instructor-edit-id">
+        <div class="form-group"><label>Full Name:</label><input type="text" id="i-name" placeholder="Full name"></div>
+        <div class="form-group"><label>Specialization:</label><input type="text" id="i-spec" placeholder="e.g. Basic & Advanced Driving"></div>
+        <div class="form-row">
+            <div class="form-group"><label>Experience (years):</label><input type="number" id="i-exp" min="0"></div>
+            <div class="form-group"><label>Phone:</label><input type="tel" id="i-phone" placeholder="+977-..."></div>
+        </div>
+        <div class="form-group"><label>Email:</label><input type="email" id="i-email" placeholder="instructor@budamahakal.com"></div>
+        <div class="form-actions">
+            <button class="btn btn-primary" onclick="saveInstructor()">Save</button>
+            <button class="btn btn-secondary" onclick="closeModal('instructor-modal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== BOOKING STATUS MODAL ===== -->
+<div class="modal-overlay" id="booking-modal">
+    <div class="modal">
+        <h3>Edit Booking</h3>
+        <input type="hidden" id="booking-edit-id">
+        <div style="margin-bottom:14px;padding:12px;background:#f8f9fa;border-radius:6px;font-size:0.9rem;" id="booking-edit-info"></div>
+        <div class="form-group">
+            <label>Status:</label>
+            <select id="booking-edit-status">
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" onclick="saveBookingStatus()">Save</button>
+            <button class="btn btn-secondary" onclick="closeModal('booking-modal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== AUTH ==========
+function doLogin() {
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            localStorage.setItem('adminToken', data.token);
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-screen').style.display = 'block';
+            loadAllData();
+        } else {
+            document.getElementById('login-error').textContent = '❌ Invalid username or password';
+        }
+    }).catch(() => {
+        document.getElementById('login-error').textContent = '❌ Server error. Try again.';
+    });
+}
+
+function doLogout() {
+    localStorage.removeItem('adminToken');
+    location.reload();
+}
+
+// Check if already logged in
+window.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        loadAllData();
+    }
+    document.getElementById('attendance-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('filter-date').value = new Date().toISOString().split('T')[0];
+});
+
+// ========== DATA ==========
+let bookings = [], bookingsFiltered = [], courses = [], instructors = [], attendance = [];
+
+async function loadAllData() {
+    await Promise.all([loadBookings(), loadCourses(), loadInstructors(), loadAttendance()]);
+    updateStats();
+    populateBookingSelect();
+    populateInstructorSelect();
+}
+
+async function loadBookings() {
+    const r = await fetch('/api/bookings');
+    const d = await r.json();
+    bookings = d.bookings || [];
+    bookingsFiltered = [...bookings];
+    renderBookingsTable();
+}
+async function loadCourses() {
+    const r = await fetch('/api/courses');
+    const d = await r.json();
+    courses = d.courses || [];
+    renderCoursesTable();
+}
+async function loadInstructors() {
+    const r = await fetch('/api/instructors');
+    const d = await r.json();
+    instructors = d.instructors || [];
+    renderInstructorsTable();
+}
+async function loadAttendance() {
+    const r = await fetch('/api/attendance');
+    const d = await r.json();
+    attendance = d.attendance || [];
+    renderAttendanceTable();
+}
+
+// ========== STATS ==========
+function updateStats() {
+    document.getElementById('total-bookings').textContent = bookings.length;
+    document.getElementById('pending-bookings').textContent = bookings.filter(b => b.status === 'Pending').length;
+    document.getElementById('total-courses').textContent = courses.length;
+    document.getElementById('total-instructors').textContent = instructors.length;
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('today-attendance').textContent = attendance.filter(a => a.date === today && a.status === 'Present').length;
+}
+
+// ========== TABS ==========
+function showSection(name, btn) {
+    document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    document.getElementById(name + '-section').classList.add('active');
+    btn.classList.add('active');
+}
+
+// ========== BOOKINGS ==========
+function getCourseNameById(id) {
+    const c = courses.find(x => x.id == id);
+    return c ? c.name : 'Unknown';
+}
+
+function filterBookings() {
+    const q = document.getElementById('booking-search').value.toLowerCase();
+    const st = document.getElementById('booking-status-filter').value;
+    bookingsFiltered = bookings.filter(b => {
+        const match = !q || b.studentName?.toLowerCase().includes(q) || b.email?.toLowerCase().includes(q) || b.phone?.includes(q);
+        const statusOk = !st || b.status === st;
+        return match && statusOk;
+    });
+    renderBookingsTable();
+}
+
+function renderBookingsTable() {
+    const tbody = document.getElementById('bookings-tbody');
+    document.getElementById('booking-count').textContent = `${bookingsFiltered.length} of ${bookings.length} records`;
+    if (!bookingsFiltered.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="no-data">No bookings found</td></tr>';
+        return;
+    }
+    tbody.innerHTML = bookingsFiltered.map(b => {
+        const badge = `badge-${(b.status || 'pending').toLowerCase()}`;
+        return `<tr>
+            <td>${b.id}</td>
+            <td><strong>${escHtml(b.studentName)}</strong></td>
+            <td>${escHtml(b.email)}</td>
+            <td>${escHtml(b.phone)}</td>
+            <td>${escHtml(getCourseNameById(b.courseID))}</td>
+            <td>${formatDate(b.preferredDate)}</td>
+            <td><span class="status-badge ${badge}">${b.status || 'Pending'}</span></td>
+            <td class="action-buttons">
+                <button class="btn btn-warning" onclick="openBookingModal(${b.id})">✏️ Status</button>
+                <button class="btn btn-danger" onclick="deleteBooking(${b.id})">🗑️ Delete</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function openBookingModal(id) {
+    const b = bookings.find(x => x.id == id);
+    if (!b) return;
+    document.getElementById('booking-edit-id').value = id;
+    document.getElementById('booking-edit-status').value = b.status || 'Pending';
+    document.getElementById('booking-edit-info').innerHTML = `<strong>${escHtml(b.studentName)}</strong> — ${escHtml(getCourseNameById(b.courseID))}<br>📅 ${formatDate(b.preferredDate)} &nbsp; 📞 ${escHtml(b.phone)}`;
+    openModal('booking-modal');
+}
+
+async function saveBookingStatus() {
+    const id = document.getElementById('booking-edit-id').value;
+    const status = document.getElementById('booking-edit-status').value;
+    const r = await fetch(`/api/bookings/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+    });
+    const d = await r.json();
+    if (d.success) {
+        closeModal('booking-modal');
+        await loadBookings();
+        updateStats();
+    } else {
+        alert('Error updating booking: ' + d.message);
+    }
+}
+
+async function deleteBooking(id) {
+    if (!confirm('Delete this booking? This cannot be undone.')) return;
+    const r = await fetch(`/api/bookings/${id}`, { method: 'DELETE' });
+    const d = await r.json();
+    if (d.success) {
+        await loadBookings();
+        populateBookingSelect();
+        updateStats();
+    } else {
+        alert('Error: ' + d.message);
+    }
+}
+
+// ========== COURSES ==========
+function renderCoursesTable() {
+    const tbody = document.getElementById('courses-tbody');
+    if (!courses.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="no-data">No courses found</td></tr>';
+        return;
+    }
+    tbody.innerHTML = courses.map(c => `<tr>
+        <td>${c.id}</td>
+        <td>${escHtml(c.name)}</td>
+        <td>${c.vehicleType || '-'}</td>
+        <td>${c.duration} days</td>
+        <td>Rs ${c.price}</td>
+        <td>${c.sessions}</td>
+        <td class="action-buttons">
+            <button class="btn btn-warning" onclick="openCourseModal(${c.id})">✏️ Edit</button>
+            <button class="btn btn-danger" onclick="deleteCourse(${c.id})">🗑️ Delete</button>
+        </td>
+    </tr>`).join('');
+}
+
+function openCourseModal(id) {
+    document.getElementById('course-edit-id').value = id || '';
+    if (id) {
+        const c = courses.find(x => x.id == id);
+        document.getElementById('course-modal-title').textContent = 'Edit Course';
+        document.getElementById('c-name').value = c.name;
+        document.getElementById('c-desc').value = c.description;
+        document.getElementById('c-vehicle').value = c.vehicleType || 'Car';
+        document.getElementById('c-duration').value = c.duration;
+        document.getElementById('c-price').value = c.price;
+        document.getElementById('c-sessions').value = c.sessions;
+    } else {
+        document.getElementById('course-modal-title').textContent = 'Add Course';
+        ['c-name','c-desc','c-duration','c-price','c-sessions'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('c-vehicle').value = 'Car';
+    }
+    openModal('course-modal');
+}
+
+async function saveCourse() {
+    const id = document.getElementById('course-edit-id').value;
+    const payload = {
+        name: document.getElementById('c-name').value.trim(),
+        description: document.getElementById('c-desc').value.trim(),
+        vehicleType: document.getElementById('c-vehicle').value,
+        duration: parseInt(document.getElementById('c-duration').value),
+        price: parseFloat(document.getElementById('c-price').value),
+        sessions: parseInt(document.getElementById('c-sessions').value)
+    };
+    if (!payload.name || !payload.duration || !payload.price || !payload.sessions) {
+        alert('Please fill all required fields.');
+        return;
+    }
+    let r;
+    if (id) {
+        r = await fetch(`/api/courses/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    } else {
+        r = await fetch('/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    }
+    const d = await r.json();
+    if (d.success || d.course) {
+        closeModal('course-modal');
+        await loadCourses();
+        updateStats();
+    } else {
+        alert('Error saving course: ' + (d.message || 'Unknown error'));
+    }
+}
+
+async function deleteCourse(id) {
+    if (!confirm('Delete this course?')) return;
+    const r = await fetch(`/api/courses/${id}`, { method: 'DELETE' });
+    const d = await r.json();
+    if (d.success) {
+        await loadCourses();
+        updateStats();
+    } else {
+        alert('Error: ' + d.message);
+    }
+}
+
+// ========== INSTRUCTORS ==========
+function renderInstructorsTable() {
+    const tbody = document.getElementById('instructors-tbody');
+    if (!instructors.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="no-data">No instructors found</td></tr>';
+        return;
+    }
+    tbody.innerHTML = instructors.map(i => `<tr>
+        <td>${i.id}</td>
+        <td><strong>${escHtml(i.name)}</strong></td>
+        <td>${escHtml(i.specialization)}</td>
+        <td>${i.experience} yrs</td>
+        <td>${escHtml(i.phone)}</td>
+        <td>${escHtml(i.email)}</td>
+        <td class="action-buttons">
+            <button class="btn btn-warning" onclick="openInstructorModal(${i.id})">✏️ Edit</button>
+            <button class="btn btn-danger" onclick="deleteInstructor(${i.id})">🗑️ Delete</button>
+        </td>
+    </tr>`).join('');
+}
+
+function openInstructorModal(id) {
+    document.getElementById('instructor-edit-id').value = id || '';
+    if (id) {
+        const i = instructors.find(x => x.id == id);
+        document.getElementById('instructor-modal-title').textContent = 'Edit Instructor';
+        document.getElementById('i-name').value = i.name;
+        document.getElementById('i-spec').value = i.specialization;
+        document.getElementById('i-exp').value = i.experience;
+        document.getElementById('i-phone').value = i.phone;
+        document.getElementById('i-email').value = i.email;
+    } else {
+        document.getElementById('instructor-modal-title').textContent = 'Add Instructor';
+        ['i-name','i-spec','i-exp','i-phone','i-email'].forEach(id => document.getElementById(id).value = '');
+    }
+    openModal('instructor-modal');
+}
+
+async function saveInstructor() {
+    const id = document.getElementById('instructor-edit-id').value;
+    const payload = {
+        name: document.getElementById('i-name').value.trim(),
+        specialization: document.getElementById('i-spec').value.trim(),
+        experience: parseInt(document.getElementById('i-exp').value),
+        phone: document.getElementById('i-phone').value.trim(),
+        email: document.getElementById('i-email').value.trim()
+    };
+    if (!payload.name || !payload.specialization) {
+        alert('Name and specialization are required.');
+        return;
+    }
+    let r;
+    if (id) {
+        r = await fetch(`/api/instructors/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    } else {
+        r = await fetch('/api/instructors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    }
+    const d = await r.json();
+    if (d.success || d.instructor) {
+        closeModal('instructor-modal');
+        await loadInstructors();
+        populateInstructorSelect();
+        updateStats();
+    } else {
+        alert('Error saving instructor: ' + (d.message || 'Unknown error'));
+    }
+}
+
+async function deleteInstructor(id) {
+    if (!confirm('Delete this instructor?')) return;
+    const r = await fetch(`/api/instructors/${id}`, { method: 'DELETE' });
+    const d = await r.json();
+    if (d.success) {
+        await loadInstructors();
+        populateInstructorSelect();
+        updateStats();
+    } else {
+        alert('Error: ' + d.message);
+    }
+}
+
+// ========== ATTENDANCE ==========
+function populateBookingSelect() {
+    const sel = document.getElementById('booking-select');
+    sel.innerHTML = '<option value="">Choose a booking...</option>';
+    bookings.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.textContent = `${b.studentName} — ${getCourseNameById(b.courseID)}`;
+        sel.appendChild(opt);
+    });
+}
+function populateInstructorSelect() {
+    const sel = document.getElementById('instructor-select');
+    sel.innerHTML = '<option value="">Choose instructor...</option>';
+    instructors.forEach(i => {
+        const opt = document.createElement('option');
+        opt.value = i.name;
+        opt.textContent = i.name;
+        sel.appendChild(opt);
+    });
+}
+
+function renderAttendanceTable(data) {
+    const list = data || attendance;
+    const tbody = document.getElementById('attendance-tbody');
+    if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="no-data">No attendance records</td></tr>';
+        return;
+    }
+    tbody.innerHTML = list.map(a => `<tr>
+        <td>${formatDate(a.date)}</td>
+        <td>${escHtml(a.studentName)}</td>
+        <td>${escHtml(a.courseName)}</td>
+        <td><span class="status-badge badge-${(a.status||'').toLowerCase()}">${a.status}</span></td>
+        <td>${escHtml(a.instructor)}</td>
+        <td>${a.notes ? escHtml(a.notes) : '-'}</td>
+        <td class="action-buttons">
+            <button class="btn btn-warning" onclick="editAttendance(${a.id})">✏️</button>
+            <button class="btn btn-danger" onclick="deleteAttendance(${a.id})">🗑️</button>
+        </td>
+    </tr>`).join('');
+}
+
+document.getElementById('attendance-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const bookingId = document.getElementById('booking-select').value;
+    const date = document.getElementById('attendance-date').value;
+    const status = document.getElementById('attendance-status').value;
+    const instructor = document.getElementById('instructor-select').value;
+    const notes = document.getElementById('attendance-notes').value;
+    if (!bookingId || !date || !instructor) { alert('Please fill all required fields'); return; }
+    const booking = bookings.find(b => b.id == bookingId);
+    const course = courses.find(c => c.id == booking?.courseID);
+    const r = await fetch('/api/attendance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId, studentName: booking.studentName, courseName: course?.name || 'Unknown', date, status, instructor, notes })
+    });
+    const d = await r.json();
+    if (d.success) {
+        clearAttendanceForm();
+        await loadAttendance();
+        updateStats();
+    } else {
+        alert('Error: ' + d.message);
+    }
+});
+
+function clearAttendanceForm() {
+    document.getElementById('attendance-form').reset();
+    document.getElementById('attendance-date').value = new Date().toISOString().split('T')[0];
+}
+
+function filterAttendanceByDate() {
+    const date = document.getElementById('filter-date').value;
+    if (!date) { loadAllAttendance(); return; }
+    fetch(`/api/attendance/date/${date}`)
+        .then(r => r.json())
+        .then(d => renderAttendanceTable(d.attendance || []));
+}
+function loadAllAttendance() { loadAttendance(); }
+
+function editAttendance(id) {
+    const a = attendance.find(x => x.id === id);
+    if (!a) return;
+    const bk = bookings.find(b => b.studentName === a.studentName);
+    if (bk) document.getElementById('booking-select').value = bk.id;
+    document.getElementById('attendance-date').value = a.date;
+    document.getElementById('attendance-status').value = a.status;
+    document.getElementById('instructor-select').value = a.instructor;
+    document.getElementById('attendance-notes').value = a.notes || '';
+    document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function deleteAttendance(id) {
+    if (!confirm('Delete this attendance record?')) return;
+    const r = await fetch(`/api/attendance/${id}`, { method: 'DELETE' });
+    const d = await r.json();
+    if (d.success) { await loadAttendance(); updateStats(); }
+    else alert('Error: ' + d.message);
+}
+
+// ========== MODAL HELPERS ==========
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ========== UTILS ==========
+function escHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+}
+function formatDate(d) {
+    if (!d) return '-';
+    try { return new Date(d).toLocaleDateString('en-NP', { year:'numeric', month:'short', day:'numeric' }); }
+    catch { return d; }
+}
+</script>
+</body>
+</html>
