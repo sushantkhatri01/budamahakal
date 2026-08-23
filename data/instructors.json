@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Sushant Khatri",
+    "specialization": "Basic and Advance",
+    "experience": 5,
+    "phone": "+977 9767654375",
+    "email": "Sushantkc97@gmail.com",
+    "createdDate": "2026-03-05T10:30:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Subash Khatri",
+    "specialization": "Highway & Long Distance",
+    "experience": 8,
+    "phone": "+977 9767654375",
+    "email": "Sushantkc97@gmail.com",
+    "createdDate": "2026-03-05T10:30:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Bhagawan Khatri",
+    "specialization": "Defensive Driving",
+    "experience": 16,
+    "phone": "+977 9767654375",
+    "email": "Sushantkc97@gmail.com",
+    "createdDate": "2026-03-05T10:30:00.000Z"
+  }
+]

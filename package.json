@@ -1,0 +1,23 @@
+{
+  "name": "budamahakal-driving-school",
+  "version": "1.0.0",
+  "description": "Interactive website for BudaMahakal Driving School",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "driving",
+    "school",
+    "website"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "nodemailer": "^8.0.1"
+  }
+}

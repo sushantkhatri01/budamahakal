@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dropdown Test</title>
+    <script>
+        console.log('=== PAGE STARTED LOADING ===');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOMContentLoaded fired');
+            
+            // Try to fetch courses
+            fetch('/api/courses')
+                .then(res => res.json())
+                .then(data => {
+                    console.log('✅ API Response:', data);
+                    const select = document.getElementById('test-select');
+                    if (select) {
+                        console.log('✅ Select element found');
+                        // Clear the default
+                        select.innerHTML = '';
+                        // Add option
+                        const opt = document.createElement('option');
+                        opt.value = '';
+                        opt.text = 'Loading...';
+                        select.appendChild(opt);
+                        
+                        // Add courses
+                        if (data.courses && data.courses.length > 0) {
+                            console.log('✅ Adding ' + data.courses.length + ' courses');
+                            data.courses.forEach(course => {
+                                const option = document.createElement('option');
+                                option.value = course.id;
+                                option.text = course.name + ' - ₹' + course.price;
+                                select.appendChild(option);
+                                console.log('Added: ' + option.text);
+                            });
+                        } else {
+                            console.error('❌ No courses in response');
+                        }
+                    } else {
+                        console.error('❌ Select element not found');
+                    }
+                })
+                .catch(err => console.error('❌ Fetch error:', err));
+        });
+        
+        console.log('=== SCRIPT LOADED ===');
+    </script>
+</head>
+<body>
+    <h1>Dropdown Test</h1>
+    <select id="test-select">
+        <option>Select a course</option>
+    </select>
+    <p>Check browser console (F12) for logs</p>
+</body>
+</html>

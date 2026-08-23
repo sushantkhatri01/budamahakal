@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "studentName": "sushant khatri",
+    "email": "sushantkc011@gmail.com",
+    "phone": "9803205531",
+    "courseID": "6",
+    "preferredDate": "2004-02-20",
+    "status": "Confirmed",
+    "createdDate": "2026-05-12T07:25:18.924Z"
+  },
+  {
+    "id": 2,
+    "studentName": "Bhagawan Khatri",
+    "email": "subaskc87@gmail.com",
+    "phone": "9803205531",
+    "courseID": "3",
+    "preferredDate": "2026-05-27",
+    "status": "Confirmed",
+    "createdDate": "2026-05-27T07:23:48.959Z"
+  },
+  {
+    "id": 3,
+    "studentName": "Sushant Khatri",
+    "email": "20039122@koi.student.edu.au",
+    "phone": "9803205531",
+    "courseID": "2",
+    "preferredDate": "2026-05-27",
+    "status": "Confirmed",
+    "createdDate": "2026-05-27T08:03:07.183Z"
+  },
+  {
+    "id": 4,
+    "studentName": "Sushant Khatri",
+    "email": "sushs@gmail.com",
+    "phone": "9803205531",
+    "courseID": "3",
+    "preferredDate": "2026-05-27",
+    "status": "Confirmed",
+    "createdDate": "2026-05-27T08:52:34.321Z"
+  }
+]

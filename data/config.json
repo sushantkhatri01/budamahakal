@@ -1,0 +1,39 @@
+{
+  "school": {
+    "name": "BudaMahakal Driving School (BMK)",
+    "email": "Sushantkc97@gmail.com",
+    "phone": "+977 9767654375",
+    "location": "Kathmandu, Nepal",
+    "description": "Professional driving training school",
+    "hours": {
+      "weekday": "7:00 AM - 6:00 PM",
+      "weekend": "Closed on Sundays"
+    },
+    "mapCoordinates": {
+      "lat": 27.61743625727494,
+      "lng": 85.52204315945342,
+      "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6753.129614572038!2d85.52204315945342!3d27.61743625727494!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb0998559736dd%3A0xe51cec6d777e8b0d!2sBuda%20MahaKal%20Driving%20School%20(BMK)!5e1!3m2!1sen!2snp!4v1772679246260!5m2!1sen!2snp"
+    }
+  },
+  "vehicles": {
+    "car": {
+      "count": 2,
+      "courses": 3
+    },
+    "bike": {
+      "count": 2,
+      "courses": 3
+    },
+    "scooter": {
+      "count": 3,
+      "courses": 3
+    }
+  },
+  "siteSettings": {
+    "currency": "NPR",
+    "currencySymbol": "₹",
+    "currencyCode": "RS",
+    "language": "en",
+    "timezone": "Asia/Kathmandu"
+  }
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Car Driving - 7 Days",
+    "vehicleType": "Car",
+    "createdDate": "2026-03-05T08:48:47.9185522+05:45",
+    "description": "Basic car driving skills and safety.",
+    "id": 1,
+    "sessions": 7,
+    "duration": 7,
+    "price": 6000
+  },
+  {
+    "name": "Car Driving - 15 Days",
+    "vehicleType": "Car",
+    "createdDate": "2026-03-05T08:48:47.9220568+05:45",
+    "description": "Advanced car driving techniques.",
+    "id": 2,
+    "sessions": 15,
+    "duration": 15,
+    "price": 12000
+  },
+  {
+    "name": "Car Driving - 25 Days",
+    "vehicleType": "Car",
+    "createdDate": "2026-03-05T08:48:47.9221408+05:45",
+    "description": "Professional car driving certification.",
+    "id": 3,
+    "sessions": 25,
+    "duration": 25,
+    "price": 20000
+  },
+  {
+    "name": "Bike Driving - 7 Days",
+    "vehicleType": "Bike",
+    "createdDate": "2026-03-05T08:48:47.9228979+05:45",
+    "description": "Beginner motorcycle riding basics.",
+    "id": 4,
+    "sessions": 7,
+    "duration": 7,
+    "price": 3000
+  },
+  {
+    "name": "Bike Driving - 15 Days",
+    "vehicleType": "Bike",
+    "createdDate": "2026-03-05T08:48:47.9230040+05:45",
+    "description": "Intermediate motorcycle skills.",
+    "id": 5,
+    "sessions": 15,
+    "duration": 15,
+    "price": 6000
+  },
+  {
+    "name": "Bike Driving - 25 Days",
+    "vehicleType": "Bike",
+    "createdDate": "2026-03-05T08:48:47.9230670+05:45",
+    "description": "Professional motorcycle training.",
+    "id": 6,
+    "sessions": 25,
+    "duration": 25,
+    "price": 10000
+  },
+  {
+    "name": "Scooter Riding - 7 Days",
+    "vehicleType": "Scooter",
+    "createdDate": "2026-03-05T08:48:47.9231184+05:45",
+    "description": "Easy scooter basics.",
+    "id": 7,
+    "sessions": 7,
+    "duration": 7,
+    "price": 3000
+  },
+  {
+    "name": "Scooter Riding - 15 Days",
+    "vehicleType": "Scooter",
+    "createdDate": "2026-03-05T08:48:47.9231658+05:45",
+    "description": "Intermediate scooter techniques.",
+    "id": 8,
+    "sessions": 15,
+    "duration": 15,
+    "price": 6000
+  },
+  {
+    "name": "Scooter Riding - 25 Days",
+    "vehicleType": "Scooter",
+    "createdDate": "2026-03-05T08:48:47.9232759+05:45",
+    "description": "Professional scooter certification.",
+    "id": 9,
+    "sessions": 25,
+    "duration": 25,
+    "price": 10000
+  }
+]

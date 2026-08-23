@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudaMahakal - Debug Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #3498db;
+        }
+        .section h2 {
+            color: #3498db;
+            margin-top: 0;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 5px 5px 0;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .select-dropdown {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        .status.ready {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔧 BudaMahakal - Debug Console</h1>
+        
+        <div class="section">
+            <h2>System Status</h2>
+            <p><strong>Current Time:</strong> <span id="current-time"></span></p>
+            <p><strong>Page URL:</strong> <span id="page-url"></span></p>
+            <p><strong>Browser:</strong> <span id="browser-info"></span></p>
+            <div id="status-badges"></div>
+        </div>
+
+        <div class="section">
+            <h2>API Tests</h2>
+            <button onclick="testAPIConnection()">Test API Connection</button>
+            <button onclick="testCourseAPI()">Test /api/courses</button>
+            <button onclick="testInstructorAPI()">Test /api/instructors</button>
+            <button onclick="clearOutput()">Clear Output</button>
+            <pre id="api-output">Output will appear here...</pre>
+        </div>
+
+        <div class="section">
+            <h2>Dropdown Functionality Test</h2>
+            <p>Test the course dropdown functionality:</p>
+            <label for="test-course-select">Select a Course:</label>
+            <select id="test-course-select" class="select-dropdown">
+                <option value="">Loading courses...</option>
+            </select>
+            <p><strong>Selected Value:</strong> <span id="selected-value">None</span></p>
+        </div>
+
+        <div class="section">
+            <h2>Courses Data Table</h2>
+            <p>All available courses:</p>
+            <table id="courses-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Vehicle Type</th>
+                        <th>Duration (days)</th>
+                        <th>Price (₹)</th>
+                        <th>Per Day</th>
+                    </tr>
+                </thead>
+                <tbody id="courses-tbody">
+                    <tr><td colspan="6">Loading courses...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Console Logs</h2>
+            <p>Application logs:</p>
+            <pre id="console-logs">Logs will appear here...\n</pre>
+        </div>
+    </div>
+
+    <script>
+        // Intercept console.log
+        const logs = [];
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logs.push('LOG: ' + args.join(' '));
+            updateConsoleLogs();
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logs.push('ERROR: ' + args.join(' '));
+            updateConsoleLogs();
+        };
+        
+        function updateConsoleLogs() {
+            const logsDiv = document.getElementById('console-logs');
+            logsDiv.textContent = logs.slice(-20).join('\n');
+            logsDiv.parentElement.scrollTop = logsDiv.parentElement.scrollHeight;
+        }
+
+        // Update page info
+        document.getElementById('current-time').textContent = new Date().toLocaleString();
+        document.getElementById('page-url').textContent = window.location.href;
+        document.getElementById('browser-info').textContent = navigator.userAgent;
+
+        // Test API connection
+        function testAPIConnection() {
+            const output = document.getElementById('api-output');
+            output.textContent = '⏳ Testing API connection...\n';
+            
+            fetch('/api/courses')
+                .then(response => {
+                    output.textContent += `✅ Server is reachable (Status: ${response.status})\n`;
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    output.textContent += `✅ API returned valid JSON\n`;
+                    output.textContent += `✅ Courses array length: ${data.courses?.length || 0}\n`;
+                    updateStatusBadges();
+                })
+                .catch(error => {
+                    output.textContent += `❌ Error: ${error.message}\n`;
+                    updateStatusBadges(true);
+                });
+        }
+
+        // Test course API
+        function testCourseAPI() {
+            const output = document.getElementById('api-output');
+            output.textContent = '⏳ Fetching courses...\n';
+            
+            fetch('/api/courses')
+                .then(response => response.json())
+                .then(data => {
+                    output.textContent = `✅ Successfully fetched ${data.courses.length} courses\n\n`;
+                    output.textContent += JSON.stringify(data.courses, null, 2);
+                    
+                    // Populate dropdown
+                    populateTestDropdown(data.courses);
+                    populateCoursesTable(data.courses);
+                })
+                .catch(error => {
+                    output.textContent += `❌ Error: ${error.message}`;
+                });
+        }
+
+        // Test instructor API
+        function testInstructorAPI() {
+            const output = document.getElementById('api-output');
+            output.textContent = '⏳ Fetching instructors...\n';
+            
+            fetch('/api/instructors')
+                .then(response => response.json())
+                .then(data => {
+                    output.textContent = `✅ Successfully fetched ${data.instructors?.length || 0} instructors\n\n`;
+                    output.textContent += JSON.stringify(data.instructors, null, 2);
+                })
+                .catch(error => {
+                    output.textContent += `❌ Error: ${error.message}`;
+                });
+        }
+
+        // Populate test dropdown
+        function populateTestDropdown(courses) {
+            const select = document.getElementById('test-course-select');
+            select.innerHTML = '<option value="">-- Select a course --</option>';
+            
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.id;
+                option.textContent = `${course.name} - ₹${course.price}`;
+                select.appendChild(option);
+            });
+            
+            select.addEventListener('change', function() {
+                document.getElementById('selected-value').textContent = this.options[this.selectedIndex].text || 'None';
+            });
+        }
+
+        // Populate courses table
+        function populateCoursesTable(courses) {
+            const tbody = document.getElementById('courses-tbody');
+            tbody.innerHTML = '';
+            
+            courses.forEach(course => {
+                const perDay = Math.round(course.price / course.duration);
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${course.id}</td>
+                    <td>${course.name}</td>
+                    <td>${course.vehicleType}</td>
+                    <td>${course.duration}</td>
+                    <td>₹${course.price}</td>
+                    <td>₹${perDay}</td>
+                `;
+            });
+        }
+
+        // Update status badges
+        function updateStatusBadges(hasError = false) {
+            const badgesDiv = document.getElementById('status-badges');
+            badgesDiv.innerHTML = `
+                <span class="status ${hasError ? 'error' : 'ready'}">
+                    ${hasError ? '❌ Server Offline' : '✅ Server Ready'}
+                </span>
+            `;
+        }
+
+        // Clear output
+        function clearOutput() {
+            document.getElementById('api-output').textContent = 'Output cleared\n';
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            console.log('Debug page loaded');
+            testCourseAPI();
+        });
+    </script>
+</body>
+</html>
