@@ -13,20 +13,41 @@ function loadCourses() {
             const coursesList = document.getElementById('courses-list');
             if (allCourses.length > 0) {
                 coursesList.innerHTML = allCourses.map(course => {
-                    const perDayPrice = Math.round(course.price / course.duration);
+                    // Strips away text indicators like " days" or " Days" to extract the pure math digits
+                    const rawDuration = String(course.duration).replace(/[^0-9]/g, '');
+                    const numericDuration = parseInt(rawDuration, 10) || 1; 
+                    const perDayPrice = Math.round(course.price / numericDuration);
+                    
                     return `
                         <div class="course-card">
-                            <div class="vehicle-badge">${course.vehicleType}</div>
+                            <span class="category-badge">${course.vehicleType || 'Scooter'}</span>
                             <h3>${course.name}</h3>
                             <p>${course.description}</p>
-                            <div class="course-details">
-                                <span><strong>Duration:</strong> ${course.duration} days</span>
-                                <span><strong>Sessions:</strong> ${course.sessions}</span>
-                                <div class="price-breakdown">
-                                    <div class="total-price"><strong>Total Price:</strong> <span class="amount">₹${course.price}</span></div>
-                                    <div class="per-day-price"><strong>Per Day:</strong> <span class="amount">₹${perDayPrice}</span></div>
+                            
+                            <div style="margin-bottom: 15px; width: 100%;">
+                                <span class="meta-label">Duration:</span>
+                                <span class="meta-value" style="float: right;">${course.duration} days</span>
+                            </div>
+                            <div style="margin-bottom: 20px; width: 100%;">
+                                <span class="meta-label">Sessions:</span>
+                                <span class="meta-value" style="float: right;">${course.sessions}</span>
+                            </div>
+                            
+                            <!-- Attractive Theme Price Container Block Box -->
+                            <div class="price-box" style="width: 100%; box-sizing: border-box;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <span>Total Price:</span>
+                                    <span class="total-price-value">₹${course.price}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; opacity: 0.9;">
+                                    <span>Per Day:</span>
+                                    <span class="per-day-value">₹${perDayPrice}</span>
                                 </div>
                             </div>
+
+                            <button class="course-btn" style="margin-top: 20px; width: 100%;" onclick="selectAndScrollToBooking('${course.id}')">
+                                Book This Course
+                            </button>
                         </div>
                     `;
                 }).join('');
@@ -42,6 +63,19 @@ function loadCourses() {
             document.getElementById('courses-list').innerHTML = '<p>Error loading courses.</p>';
         });
 }
+
+// Interactive helper bridge to select dropdown item and snap to view element
+window.selectAndScrollToBooking = function(courseId) {
+    const dropdown = document.getElementById('course');
+    const bookingSection = document.getElementById('booking');
+    
+    if (dropdown) {
+        dropdown.value = courseId;
+    }
+    if (bookingSection) {
+        bookingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+};
 
 // Populate course dropdown
 function populateCourseDropdown() {
