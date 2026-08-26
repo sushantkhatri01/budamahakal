@@ -15,6 +15,49 @@
             text-align: center;
             color: #fff;
         }
+
+        /* Container Badge */
+        .category-badge {
+            background-color: #0056b3;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        /* Metadata Labels */
+        .meta-label {
+            color: #444444; 
+            font-weight: 600;
+        }
+
+        .meta-value {
+            color: #c82333; 
+            font-weight: 700;
+        }
+
+        /* Premium Price Block */
+        .price-box {
+            background: linear-gradient(135deg, #111111, #222222); 
+            border-left: 5px solid #ffcc00; 
+            border-radius: 8px;
+            padding: 20px;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .total-price-value {
+            color: #ffcc00; 
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .per-day-value {
+            color: #ffdb4d; 
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -41,60 +84,19 @@
             <button class="cta-button" onclick="document.getElementById('booking').scrollIntoView()">Book a Lesson</button>
         </div>
     </section>
-/* Container Badge - (Old Sky Blue) */
-.category-badge {
-    background-color: #0056b3;
-    color: #ffffff;
-    font-weight: bold;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    display: inline-block;
-}
 
-/* Metadata Labels - (Old Bright Red Labels) */
-.meta-label {
-    color: #444444; /* Clean dark neutral instead of aggressive bright red */
-    font-weight: 600;
-}
-
-.meta-value {
-    color: #c82333; /* Elegant crimson focus highlight for the values */
-    font-weight: 700;
-}
-
-/* Premium Price Block - (Old Purple Gradient Box) */
-.price-box {
-    background: linear-gradient(135deg, #111111, #222222); /* Dark professional slate foundation */
-    border-left: 5px solid #ffcc00; /* Distinct brand accent line hook */
-    border-radius: 8px;
-    padding: 20px;
-    color: #ffffff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-}
-
-.total-price-value {
-    color: #ffcc00; /* Radiant glowing gold for the primary financial amount */
-    font-size: 1.5rem;
-    font-weight: 800;
-}
-
-.per-day-value {
-    color: #ffdb4d; /* Slightly lighter gold supporting typography */
-    font-weight: 600;
-}
     <!-- Courses Section -->
     <section id="courses" class="courses">
-    <div class="container">
-        <h2 class="section-title">Our Courses & Packages</h2>
-        <div id="courses-list" class="courses-grid">
-            <div class="loading-spinner">
-                <div class="spinner"></div>
-                <p>Loading course options...</p>
+        <div class="container">
+            <h2 class="section-title">Our Courses & Packages</h2>
+            <div id="courses-list" class="courses-grid">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Loading course options...</p>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
     <!-- Instructors Section -->
     <section id="instructors" class="instructors">
